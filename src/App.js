@@ -1,24 +1,28 @@
 import React, { Component } from 'react';
 import './App.css';
 import Navbar from './shared/Navbar';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 import Home from './components/Home.js';
 
 /**
  * Imports for freedom-for-data
  */
-import Freedom from 'freedom-for-data/index.js';
+import Freedom from 'freedom-for-data';
 
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      freedom: ''
+    }
+  }
 
   async componentDidMount() {
-
     if (window.ethereum) {
 
       try {
-
         // Request account access
         await window.ethereum.enable();
         console.log("Account access enabled");
@@ -31,6 +35,21 @@ class App extends Component {
         /**
          * Load first account. Now we can initialize all our stuff.
          */
+        const fakeFreedom = [
+            {
+              firstname: "feng",
+              lastname: "chen"
+            },
+            {
+              firstname: "pat",
+              lastname: "toner"
+            }
+          ]
+
+        this.setState({
+          freedom: fakeFreedom
+        })
+
         await window.web3.eth.getAccounts(async function (error, accounts) {
 
           if (error) {
@@ -38,7 +57,6 @@ class App extends Component {
           }
 
           var account = accounts[0];
-
 
           /** 
            * Get record contract service
@@ -48,8 +66,6 @@ class App extends Component {
             window.web3Provider,
             { host: 'localhost', port: '5001' }
           );
-
-
           window.freedom = freedom;
           console.log('freedom-for-data-configured');
 
@@ -71,7 +87,7 @@ class App extends Component {
       <Router>
         <div>
           <Navbar></Navbar>
-          <Route path="/" exact component={Home} />
+          <Route path="/" exact component={() => <Home freedom={this.state.freedom} />} />
         </div>
       </Router>
     );
